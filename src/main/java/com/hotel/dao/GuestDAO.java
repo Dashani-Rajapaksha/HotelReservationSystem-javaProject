@@ -49,4 +49,29 @@ public class GuestDAO {
 
     return -1;
 }
+    public Guest findByNic(Connection conn, String nic) {
+
+    String sql = "SELECT * FROM guests WHERE NIC = ?";
+
+    try {
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, nic);
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            return new Guest(
+                    rs.getString("name"),
+                    rs.getString("address"),
+                    rs.getString("contact"),
+                    rs.getString("NIC")
+            );
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return null;
+}
 }

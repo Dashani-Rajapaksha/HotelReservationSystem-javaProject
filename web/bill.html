@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Print Bill</title>
+
+    <style>
+        body {
+            font-family: Arial;
+        }
+
+        .bill-container {
+            border: 2px solid black;
+            padding: 20px;
+            width: 400px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .buttons {
+            margin-top: 15px;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .bill-container, .bill-container * {
+                visibility: visible;
+            }
+
+            .bill-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h2>Calculate & Print Bill</h2>
+
+Reservation ID:
+<input type="number" id="reservationId" required>
+<button onclick="generateBill()">Generate</button>
+
+<div class="bill-container" id="billContainer">
+    <h3>HOTEL INVOICE</h3>
+    <hr>
+    <p><strong>Reservation ID:</strong> <span id="b_resId"></span></p>
+    <p><strong>Room ID:</strong> <span id="b_roomId"></span></p>
+    <p><strong>Check-In:</strong> <span id="b_checkIn"></span></p>
+    <p><strong>Check-Out:</strong> <span id="b_checkOut"></span></p>
+    <p><strong>Nights:</strong> <span id="b_nights"></span></p>
+    <p><strong>Total Amount:</strong> Rs. <span id="b_total"></span></p>
+    <hr>
+
+    <div class="buttons">
+        <button onclick="window.print()">Print Bill</button>
+    </div>
+</div>
+
+<br><br>
+<a href="/dashboard.html">Back</a>
+
+<script>
+function generateBill() {
+
+    const reservationId = document.getElementById("reservationId").value;
+
+    fetch("/bill", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "reservationId=" + reservationId
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.success) {
+
+            document.getElementById("billContainer").style.display = "block";
+
+            document.getElementById("b_resId").innerText = data.reservationId;
+            document.getElementById("b_roomId").innerText = data.roomId;
+            document.getElementById("b_checkIn").innerText = data.checkIn;
+            document.getElementById("b_checkOut").innerText = data.checkOut;
+            document.getElementById("b_nights").innerText = data.nights;
+            document.getElementById("b_total").innerText = data.total;
+
+        } else {
+            alert("Bill not found!");
+        }
+
+    })
+    .catch(error => {
+        alert("Error generating bill.");
+    });
+}
+</script>
+
+</body>
+</html>

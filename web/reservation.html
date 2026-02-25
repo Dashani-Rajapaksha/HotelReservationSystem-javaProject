@@ -1,0 +1,148 @@
+<html>
+<head>
+    <title>Room Reservation</title>
+
+    <script>
+    async function loadGuest() {
+
+        const nic = document.getElementById("nic").value;
+
+        if (!nic) {
+            alert("Enter NIC first");
+            return;
+        }
+
+        try {
+            const response = await fetch("/guest?nic=" + encodeURIComponent(nic));
+            const data = await response.json();
+
+            console.log(data); // DEBUG
+
+            if (data.exists) {
+                document.getElementById("name").value = data.name;
+                document.getElementById("address").value = data.address;
+                document.getElementById("contact").value = data.contact;
+            } else {
+                alert("New to our hotel?");
+                window.location.href = "/register.html";
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Something went wrong");
+        }
+    }
+    
+    function loadRooms() {
+
+        const selected = document.querySelector('input[name="typeId"]:checked');
+
+        if (!selected) return;
+
+        const typeId = selected.value;
+
+        fetch('/availableRooms?typeId=' + typeId)
+            .then(response => response.json())
+            .then(data => {
+
+                const select = document.getElementById('roomSelect');
+                select.innerHTML = '<option value="">-- Select Room --</option>';
+
+                data.forEach(room => {
+                    const option = document.createElement('option');
+                    option.value = room.roomId;
+                    option.textContent = room.roomNumber;
+                    select.appendChild(option);
+                });
+            });
+    }
+    
+    function checkAvailability() {
+
+        const typeRadio = document.querySelector('input[name="typeId"]:checked');
+        const checkIn = document.getElementById("checkIn").value;
+        const checkOut = document.getElementById("checkOut").value;
+
+        if (!typeRadio || !checkIn || !checkOut) {
+            alert("Please select room type and dates first.");
+            return;
+        }
+
+        const typeId = typeRadio.value;
+
+        fetch(`/availableRooms?typeId=${typeId}&checkIn=${checkIn}&checkOut=${checkOut}`)
+            .then(response => response.json())
+            .then(data => {
+
+                const select = document.getElementById("roomSelect");
+                select.innerHTML = '<option value="">-- Select Room --</option>';
+
+                if (data.length === 0) {
+                    alert("No rooms available for selected dates.");
+                    return;
+                }
+
+                data.forEach(room => {
+                    const option = document.createElement("option");
+                    option.value = room.roomId;
+                    option.textContent = room.roomNumber;
+                    select.appendChild(option);
+                });
+            });
+    }
+</script>
+</head>
+<body>
+
+<h2>Book a Room</h2>
+
+<form method="POST" action="/book">
+
+    NIC:
+    <input type="text" id="nic" name="nic">
+    <button type="button" onclick="loadGuest()">Load</button>
+    <br><br>
+
+    Name:
+    <input type="text" id="name" name="name"><br><br>
+
+    Address:
+    <input type="text" id="address" name="address"><br><br>
+
+    Contact:
+    <input type="text" id="contact" name="contact"><br><br>
+
+    <h3>Select Room Type</h3>
+
+    <label><input type="radio" name="typeId" value="1"> STANDARD</label><br>
+    <label><input type="radio" name="typeId" value="2"> DELUXE</label><br>
+    <label><input type="radio" name="typeId" value="3"> SUITE</label><br>
+    <label><input type="radio" name="typeId" value="4"> FAMILY</label><br>
+    <label><input type="radio" name="typeId" value="5"> PRESIDENTIAL</label>
+
+    <br><br>
+
+    Check-in:
+    <input type="date" id="checkIn" name="checkIn"><br><br>
+
+    Check-out:
+    <input type="date" id="checkOut" name="checkOut"><br><br>
+
+    <button type="button" onclick="checkAvailability()">
+        Check Availability
+    </button>
+
+    <br><br>
+
+    <label>Available Rooms:</label>
+    <select id="roomSelect" name="roomId">
+        <option value="">-- Select Room --</option>
+    </select>
+    
+
+    <button type="submit">Book Room</button>
+
+</form>
+
+</body>
+</html>

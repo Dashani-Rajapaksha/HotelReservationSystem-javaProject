@@ -37,4 +37,76 @@ public class ReservationDAO {
 
         return -1;
     }
+    // =====================================================
+    // Get Room ID by Reservation ID (ACTIVE only)
+    // =====================================================
+    public int getRoomIdByReservationId(Connection conn, int reservationId) {
+
+        String sql = "SELECT room_id FROM reservations WHERE reservation_id = ? AND status = 'ACTIVE'";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, reservationId);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("room_id");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    // =====================================================
+    // Update Reservation Status
+    // =====================================================
+    public boolean updateReservationStatus(Connection conn, int reservationId, String status) {
+
+        String sql = "UPDATE reservations SET status = ? WHERE reservation_id = ?";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, status);
+            stmt.setInt(2, reservationId);
+
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    
+    public Reservation findById(Connection conn, int reservationId) {
+
+    String sql = "SELECT * FROM reservations WHERE reservation_id = ?";
+
+    try {
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, reservationId);
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            Reservation r = new Reservation();
+            r.setReservationId(rs.getInt("reservation_id"));
+            r.setGuestId(rs.getInt("guest_id"));
+            r.setRoomId(rs.getInt("room_id"));
+            r.setCheckIn(rs.getString("check_in"));
+            r.setCheckOut(rs.getString("check_out"));
+            return r;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return null;
+}
 }

@@ -35,4 +35,28 @@ public class BillDAO {
 
         return -1;
     }
+    public Bill findBillByReservationId(Connection conn, int reservationId) {
+
+    String sql = "SELECT * FROM bills WHERE reservation_id = ?";
+
+    try {
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, reservationId);
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            Bill bill = new Bill();
+            bill.setBillId(rs.getInt("bill_id"));
+            bill.setReservationId(rs.getInt("reservation_id"));
+            bill.setTotalAmount(rs.getDouble("total_amount"));
+            return bill;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return null;
+}
 }

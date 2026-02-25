@@ -9,23 +9,15 @@ public class AuthService {
     public boolean login(String username, String password) {
 
         if (username == null || username.isBlank()) {
-            System.out.println("Username cannot be empty.");
+            System.out.println("Username empty");
             return false;
         }
 
         if (password == null || password.isBlank()) {
-            System.out.println("Password cannot be empty.");
+            System.out.println("Password empty");
             return false;
         }
 
-        boolean authenticated = userDAO.authenticate(username, password);
-
-        if (!authenticated) {
-            System.out.println("Invalid username or password.");
-            return false;
-        }
-
-        System.out.println("Login successful!");
-        return true;
+        return userDAO.authenticate(username, password);
     }
 }
