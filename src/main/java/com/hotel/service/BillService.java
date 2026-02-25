@@ -10,7 +10,7 @@ import java.time.temporal.ChronoUnit;
 
 public class BillService {
 
-    public double calculateTotal(int reservationId) {
+    public double calculateTotal(Connection conn, int reservationId) {
 
         String sql =
                 "SELECT rt.rate, r.check_in, r.check_out " +
@@ -20,7 +20,7 @@ public class BillService {
                 "WHERE r.reservation_id = ?";
 
         try {
-            Connection conn = DatabaseManager.getInstance().getConnection();
+            
 
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, reservationId);

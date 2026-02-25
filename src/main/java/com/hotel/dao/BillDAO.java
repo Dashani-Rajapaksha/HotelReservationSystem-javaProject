@@ -10,13 +10,11 @@ import java.sql.Statement;
 
 public class BillDAO {
 
-    public int saveBill(Bill bill) {
+    public int saveBill(Connection conn, Bill bill) {
 
         String sql = "INSERT INTO bills (reservation_id, total_amount) VALUES (?, ?)";
 
         try {
-            Connection conn = DatabaseManager.getInstance().getConnection();
-
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             stmt.setInt(1, bill.getReservationId());

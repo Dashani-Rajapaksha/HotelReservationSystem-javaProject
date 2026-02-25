@@ -1,7 +1,8 @@
 package com.hotel.service;
-
+import java.sql.Connection;
 import com.hotel.dao.*;
 import com.hotel.model.*;
+import com.hotel.database.DatabaseManager;
 
 public class ReservationService {
 
@@ -56,67 +57,79 @@ public class ReservationService {
     return true;
 }
 
-    public boolean bookRoom(
-            String name,
-            String address,
-            String contact,
-            String nic,
-            int typeId,
-            String checkIn,
-            String checkOut
-    ) {
-        if (!validateInput(name, contact, nic, checkIn, checkOut)) {
-    return false;
-}
 
-        // 1️⃣ Save or get guest
+
+
+public boolean bookRoom(
+        String name,
+        String address,
+        String contact,
+        String nic,
+        int typeId,
+        String checkIn,
+        String checkOut
+) {
+
+    if (!validateInput(name, contact, nic, checkIn, checkOut)) {
+        return false;
+    }
+
+    Connection conn = null;
+
+    try {
+        conn = DatabaseManager.getInstance().getConnection();
+
+        conn.setAutoCommit(false); // 🔥 START TRANSACTION
+
+        // 1️⃣ Guest
         Guest guest = new Guest(name, address, contact, nic);
-        int guestId = guestDAO.saveOrGetGuest(guest);
+        int guestId = guestDAO.saveOrGetGuest(conn, guest);
+        if (guestId == -1) throw new Exception("Guest failed");
 
-        if (guestId == -1) {
-            System.out.println("Guest processing failed.");
-            return false;
-        }
+        // 2️⃣ Availability
+        int roomId = roomDAO.findAvailableRoom(conn, typeId, checkIn, checkOut);
+        if (roomId == -1) throw new Exception("No rooms available");
 
-        // 2️⃣ Check room availability
-        int roomId = roomDAO.findAvailableRoom(typeId, checkIn, checkOut);
+        // 3️⃣ Reservation
+        Reservation reservation = new Reservation(guestId, roomId, checkIn, checkOut);
+        int reservationId = reservationDAO.saveReservation(conn, reservation);
+        if (reservationId == -1) throw new Exception("Reservation failed");
 
-        if (roomId == -1) {
-            System.out.println("No rooms available.");
-            return false;
-        }
-
-        // 3️⃣ Save reservation
-        Reservation reservation = new Reservation(
-                guestId,
-                roomId,
-                checkIn,
-                checkOut
-        );
-
-        int reservationId = reservationDAO.saveReservation(reservation);
-
-        if (reservationId == -1) {
-            System.out.println("Reservation failed.");
-            return false;
-        }
-
-        // 4️⃣ Calculate bill
-        double total = billService.calculateTotal(reservationId);
-
+        // 4️⃣ Billing
+        double total = billService.calculateTotal(conn, reservationId);
         Bill bill = new Bill(reservationId, total);
+        int billId = billDAO.saveBill(conn, bill);
+        if (billId == -1) throw new Exception("Bill failed");
 
-        int billId = billDAO.saveBill(bill);
-
-        if (billId == -1) {
-            System.out.println("Bill generation failed.");
-            return false;
-        }
+        conn.commit(); // ✅ SUCCESS
 
         System.out.println("Booking successful!");
         System.out.println("Reservation ID: " + reservationId);
         System.out.println("Total Amount: " + total);
 
         return true;
+
+    } catch (Exception e) {
+
+        try {
+            if (conn != null) {
+                conn.rollback(); // ❌ FAILURE → ROLLBACK
+            }
+        } catch (Exception rollbackEx) {
+            rollbackEx.printStackTrace();
+        }
+
+        System.out.println("Booking failed. Transaction rolled back.");
+        e.printStackTrace();
+        return false;
+
+    } finally {
+
+        try {
+            if (conn != null) {
+                conn.setAutoCommit(true); // reset
+            }
+        } catch (Exception ignored) {}
     }
+}
 }

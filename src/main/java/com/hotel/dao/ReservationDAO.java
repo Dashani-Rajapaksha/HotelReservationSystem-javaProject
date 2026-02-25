@@ -10,13 +10,11 @@ import java.sql.Statement;
 
 public class ReservationDAO {
 
-    public int saveReservation(Reservation reservation) {
+    public int saveReservation(Connection conn, Reservation reservation) {
 
         String sql = "INSERT INTO reservations (guest_id, room_id, check_in, check_out) VALUES (?, ?, ?, ?)";
 
         try {
-            Connection conn = DatabaseManager.getInstance().getConnection();
-
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             stmt.setInt(1, reservation.getGuestId());

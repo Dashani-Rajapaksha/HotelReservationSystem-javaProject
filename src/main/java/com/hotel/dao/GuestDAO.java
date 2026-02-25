@@ -10,11 +10,9 @@ import java.sql.Statement;
 
 public class GuestDAO {
 
-    public int saveOrGetGuest(Guest guest) {
+    public int saveOrGetGuest(Connection conn, Guest guest) {
 
     try {
-        Connection conn = DatabaseManager.getInstance().getConnection();
-
         // 1️⃣ Check if NIC already exists
         String checkSql = "SELECT guest_id FROM guests WHERE NIC = ?";
         PreparedStatement checkStmt = conn.prepareStatement(checkSql);

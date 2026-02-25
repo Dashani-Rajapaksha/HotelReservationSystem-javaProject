@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 
 public class RoomDAO {
 
-    public int findAvailableRoom(int typeId, String checkIn, String checkOut) {
+    public int findAvailableRoom(Connection conn, int typeId, String checkIn, String checkOut){
 
         String sql =
         "SELECT r.room_id " +
@@ -19,7 +19,6 @@ public class RoomDAO {
         ") LIMIT 1";
 
         try {
-            Connection conn = DatabaseManager.getInstance().getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             stmt.setInt(1, typeId);
