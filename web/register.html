@@ -1,22 +1,151 @@
 <html>
 <head>
     <title>Guest Registration</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #445A67, #57838D);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            width: 380px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h2 {
+            color: #445A67;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #B4C9C7;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #57838D;
+            box-shadow: 0 0 5px #57838D;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .register-btn {
+            background-color: #F3BFB3;
+            color: #445A67;
+        }
+
+        .register-btn:hover {
+            background-color: #CCADB2;
+        }
+
+        .back-btn {
+            background-color: #445A67;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .back-btn:hover {
+            background-color: #57838D;
+        }
+
+        /* Message Box */
+        .message-box {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .success {
+            background-color: #B4C9C7;
+            color: #445A67;
+        }
+
+        .error {
+            background-color: #F3BFB3;
+            color: #445A67;
+        }
+
+    </style>
 </head>
 <body>
 
-<h2>Guest Registration</h2>
+<div class="card">
+    <h2>Guest Registration</h2>
 
-<form method="POST" action="/register">
-    Name: <input type="text" name="name" required><br><br>
-    Address: <input type="text" name="address" required><br><br>
-    Contact: <input type="text" name="contact" required><br><br>
-    NIC: <input type="text" name="nic" required><br><br>
+    <form id="registerForm">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="text" name="address" placeholder="Address" required>
+        <input type="text" name="contact" placeholder="Contact Number" required>
+        <input type="text" name="nic" placeholder="NIC Number" required>
 
-    <button type="submit">Register</button>
-</form>
+        <button type="submit" class="btn register-btn">Register Guest</button>
+    </form>
 
-<br>
-<a href="/dashboard.html">Back</a>
+    <div id="messageBox" class="message-box"></div>
+
+    <button class="btn back-btn" onclick="goDashboard()">Back to Dashboard</button>
+</div>
+
+<script>
+document.getElementById("registerForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const formData = new URLSearchParams(new FormData(this));
+
+    fetch("/register", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        const box = document.getElementById("messageBox");
+        box.style.display = "block";
+        box.textContent = data.message;
+
+        if (data.success) {
+            box.className = "message-box success";
+            document.getElementById("registerForm").reset();
+        } else {
+            box.className = "message-box error";
+        }
+    })
+    .catch(error => {
+        alert("Something went wrong!");
+    });
+});
+
+function goDashboard() {
+    window.location.href = "/dashboard";
+}
+</script>
 
 </body>
 </html>

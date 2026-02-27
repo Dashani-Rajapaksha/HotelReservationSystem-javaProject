@@ -1,13 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.hotel.model;
 
 public class Room {
 
     private int roomId;
     private String roomNumber;
+    private String status;
+    private String typeName;
+    private double rate;
 
     public Room() {
     }
@@ -32,4 +31,29 @@ public class Room {
     public void setRoomNumber(String roomNumber) {
         this.roomNumber = roomNumber;
     }
+    
+    public String getStatus() {
+    return status;
 }
+
+public void setStatus(String status) {
+    this.status = status;
+}
+
+public String getTypeName() {
+    return typeName;
+}
+
+public void setTypeName(String typeName) {
+    this.typeName = typeName;
+}
+
+public double getRate() {
+    return rate;
+}
+
+public void setRate(double rate) {
+    this.rate = rate;
+}
+
+} 

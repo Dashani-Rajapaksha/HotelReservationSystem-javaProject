@@ -1,8 +1,5 @@
 package com.hotel.dao;
-
-import com.hotel.database.DatabaseManager;
 import com.hotel.model.Reservation;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,12 +7,19 @@ import java.sql.Statement;
 
 public class ReservationDAO {
 
+    // =====================================================
+    // Save Reservation (Default status = ACTIVE)
+    // =====================================================
     public int saveReservation(Connection conn, Reservation reservation) {
 
-        String sql = "INSERT INTO reservations (guest_id, room_id, check_in, check_out) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO reservations " +
+                "(guest_id, room_id, check_in, check_out, status) " +
+                "VALUES (?, ?, ?, ?, 'ACTIVE')";
 
         try {
-            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            PreparedStatement stmt =
+                    conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             stmt.setInt(1, reservation.getGuestId());
             stmt.setInt(2, reservation.getRoomId());
@@ -37,14 +41,17 @@ public class ReservationDAO {
 
         return -1;
     }
-    // =====================================================
-    // Get Room ID by Reservation ID (ACTIVE only)
-    // =====================================================
-    public int getRoomIdByReservationId(Connection conn, int reservationId) {
 
-        String sql = "SELECT room_id FROM reservations WHERE reservation_id = ? AND status = 'ACTIVE'";
+    // =====================================================
+    // Find Room ID by Reservation ID (Only ACTIVE)
+    // =====================================================
+    public int findRoomIdByReservation(Connection conn, int reservationId) {
+
+        String sql = "SELECT room_id FROM reservations " +
+                     "WHERE reservation_id = ? AND status = 'ACTIVE'";
 
         try {
+
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, reservationId);
 
@@ -58,17 +65,21 @@ public class ReservationDAO {
             e.printStackTrace();
         }
 
-        return -1;
+        return -1; // Not found or already checked out
     }
 
     // =====================================================
-    // Update Reservation Status
+    // Update Reservation Status (ACTIVE → CHECKED_OUT)
     // =====================================================
-    public boolean updateReservationStatus(Connection conn, int reservationId, String status) {
+    public boolean updateReservationStatus(
+            Connection conn,
+            int reservationId,
+            String status) {
 
         String sql = "UPDATE reservations SET status = ? WHERE reservation_id = ?";
 
         try {
+
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, status);
             stmt.setInt(2, reservationId);

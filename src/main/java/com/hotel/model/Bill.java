@@ -6,36 +6,42 @@ public class Bill {
     private int reservationId;
     private double totalAmount;
 
-    //Empty Constructor (REQUIRED)
+    //Empty Constructor (Required for DAO mapping)
     public Bill() {
     }
 
-    // Existing constructor for saving bill
+    //Constructor used when saving new bill
     public Bill(int reservationId, double totalAmount) {
         this.reservationId = reservationId;
         this.totalAmount = totalAmount;
     }
 
-    // Getters and Setters
+    // ==========================
+    // GETTERS
+    // ==========================
 
     public int getBillId() {
         return billId;
-    }
-
-    public void setBillId(int billId) {
-        this.billId = billId;
     }
 
     public int getReservationId() {
         return reservationId;
     }
 
-    public void setReservationId(int reservationId) {
-        this.reservationId = reservationId;
-    }
-
     public double getTotalAmount() {
         return totalAmount;
+    }
+
+    // ==========================
+    // SETTERS
+    // ==========================
+
+    public void setBillId(int billId) {
+        this.billId = billId;
+    }
+
+    public void setReservationId(int reservationId) {
+        this.reservationId = reservationId;
     }
 
     public void setTotalAmount(double totalAmount) {

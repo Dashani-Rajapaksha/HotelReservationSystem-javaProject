@@ -1,0 +1,179 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Help & Support</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #445A67, #57838D);
+            padding: 40px 0;
+        }
+
+        .container {
+            width: 900px;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+        }
+
+        h1 {
+            text-align: center;
+            color: #445A67;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #57838D;
+            margin-top: 30px;
+            border-bottom: 2px solid #B4C9C7;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            color: #445A67;
+            margin-top: 20px;
+        }
+
+        p, li {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .highlight {
+            background-color: #B4C9C7;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            font-weight: 600;
+            color: #445A67;
+        }
+
+        .btn {
+            margin-top: 30px;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            background-color: #445A67;
+            color: white;
+        }
+
+        .btn:hover {
+            background-color: #57838D;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Help & Support – User Guide</h1>
+
+    <div class="section">
+        <h2>1️⃣ System Login</h2>
+        <ul>
+            <li>Login using your assigned username and password.</li>
+            <li>After successful login, you will be redirected to the Dashboard.</li>
+            <li>You can return to the Dashboard from any page using the <span class="highlight">Back to Dashboard</span> button.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>2️⃣ Guest Registration</h2>
+        <ul>
+            <li>Navigate to <b>Guest Registration</b> from the Dashboard.</li>
+            <li>Enter Full Name, Address, Contact Number, and NIC.</li>
+            <li>Click <b>Register Guest</b> to save the guest details.</li>
+            <li>A confirmation message will be displayed upon successful registration.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3️⃣ Book a Room</h2>
+
+        <h3>Loading Guest Details</h3>
+        <ul>
+            <li>Enter the guest NIC and click <b>Load</b>.</li>
+            <li>If registered, guest details will auto-fill.</li>
+            <li>If not registered, return to Guest Registration.</li>
+        </ul>
+
+        <h3>Checking Availability</h3>
+        <ul>
+            <li>Select a Room Type.</li>
+            <li>Choose Check-In and Check-Out dates.</li>
+            <li>Click <b>Check Availability</b>.</li>
+            <li>Available rooms will appear in the dropdown list.</li>
+        </ul>
+
+        <h3>Booking Confirmation</h3>
+        <ul>
+            <li>Select a room and click <b>Book Room</b>.</li>
+            <li>A confirmation message will display Reservation ID and Total Amount.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4️⃣ Guest Check-Out</h2>
+        <ul>
+            <li>Filter reservations using From and To dates.</li>
+            <li>Reservations will appear in a table.</li>
+            <li>Enter Reservation ID and click <b>Process Check-Out</b>.</li>
+            <li>Status will change to CHECKED_OUT and room becomes AVAILABLE.</li>
+            <li>Click <b>Available Rooms</b> To navigate Available rooms page and display the <b>ACTIVE</b> & <b>AVAILABLE</b> rooms on given dates</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>5️⃣ Calculate & Print Bill</h2>
+
+        <h3>View Active Reservations</h3>
+        <ul>
+            <li>Enter NIC to load active reservations.</li>
+            <li>Table displays Reservation ID, Dates, Nights, and Amount.</li>
+        </ul>
+
+        <h3>Generate & Print Bill</h3>
+        <ul>
+            <li>Enter Reservation ID and click <b>Generate</b>.</li>
+            <li>Printable invoice will display Reservation No, NIC, Name, Room Number, Dates, Nights, and Total Amount.</li>
+            <li>Click <b>Print Bill</b> to print the invoice.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>6️⃣ Help & Support</h2>
+        <p>This section provides guidance on system functionality.  
+        For further assistance, please contact the system administrator.</p>
+    </div>
+
+    <button class="btn" onclick="goDashboard()">Back to Dashboard</button>
+
+</div>
+
+<script>
+function goDashboard() {
+    window.location.href = "/dashboard";
+}
+</script>
+
+</body>
+</html>

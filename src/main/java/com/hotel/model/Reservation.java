@@ -8,11 +8,11 @@ public class Reservation {
     private String checkIn;
     private String checkOut;
 
-    // Empty Constructor (REQUIRED)
+    // Empty Constructor (Required for DAO mapping)
     public Reservation() {
     }
 
-    // Existing constructor for booking
+    // Constructor used when creating new reservation
     public Reservation(int guestId, int roomId, String checkIn, String checkOut) {
         this.guestId = guestId;
         this.roomId = roomId;
@@ -20,42 +20,48 @@ public class Reservation {
         this.checkOut = checkOut;
     }
 
-    // Getters and Setters
+    // ==========================
+    // GETTERS
+    // ==========================
 
     public int getReservationId() {
         return reservationId;
-    }
-
-    public void setReservationId(int reservationId) {
-        this.reservationId = reservationId;
     }
 
     public int getGuestId() {
         return guestId;
     }
 
-    public void setGuestId(int guestId) {
-        this.guestId = guestId;
-    }
-
     public int getRoomId() {
         return roomId;
-    }
-
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
     }
 
     public String getCheckIn() {
         return checkIn;
     }
 
-    public void setCheckIn(String checkIn) {
-        this.checkIn = checkIn;
-    }
-
     public String getCheckOut() {
         return checkOut;
+    }
+
+    // ==========================
+    // SETTERS
+    // ==========================
+
+    public void setReservationId(int reservationId) {
+        this.reservationId = reservationId;
+    }
+
+    public void setGuestId(int guestId) {
+        this.guestId = guestId;
+    }
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
+    }
+
+    public void setCheckIn(String checkIn) {
+        this.checkIn = checkIn;
     }
 
     public void setCheckOut(String checkOut) {

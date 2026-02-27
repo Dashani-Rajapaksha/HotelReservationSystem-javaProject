@@ -1,77 +1,278 @@
 <html>
 <head>
-    <title>Room Reservation</title>
+<meta charset="UTF-8">
+<title>Room Reservation</title>
 
-    <script>
+<style>
+
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(to right, #445A67, #57838D);
+
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;   /* 🔥 Important */
+
+        min-height: 100vh;         /* 🔥 Important */
+        padding: 40px 0;
+    }
+
+    .container {
+        width: 650px;
+        background: white;
+        padding: 40px;
+        border-radius: 18px;
+        box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+    }
+
+    h2 {
+        text-align: center;
+        color: #445A67;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #445A67;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #B4C9C7;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    input:focus, select:focus {
+        outline: none;
+        border-color: #57838D;
+        box-shadow: 0 0 6px #57838D;
+    }
+
+    /* NIC row */
+    .nic-row {
+        display: flex;
+        gap: 10px;
+    }
+
+    .nic-row input {
+        flex: 1;
+    }
+
+    .room-types {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 10px;
+    }
+
+    .room-option {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 50px;
+        padding: 0 15px;
+        border: 2px solid #B4C9C7;
+        border-radius: 10px;
+        background-color: #F9FBFB;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        font-weight: 500;
+        color: #445A67;
+    }
+
+    .room-option:hover {
+        border-color: #57838D;
+        background-color: #EAF2F1;
+    }
+
+    /* Hide default radio */
+    .room-option input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #57838D;
+        border-radius: 50%;
+        margin-right: 12px;
+        position: relative;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    /* Inner dot */
+    .room-option input[type="radio"]:checked::before {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #57838D;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    /* Highlight selected card */
+    .room-option input[type="radio"]:checked + span {
+        font-weight: 600;
+    }
+
+    .room-option input[type="radio"]:checked {
+        border-color: #445A67;
+    }
+
+    .room-option input[type="radio"]:checked ~ span {
+        color: #445A67;
+    }
+
+    .room-option:has(input[type="radio"]:checked) {
+        border-color: #445A67;
+        background-color: #B4C9C7;
+    }
+
+    .room-option:hover {
+        border-color: #57838D;
+        background-color: #EAF2F1;
+    }
+
+    .room-option input[type="radio"] {
+        margin-right: 10px;
+        transform: scale(1.1);
+        accent-color: #57838D;
+    }
+
+    /* ===== Buttons ===== */
+    .btn {
+        width: 100%;
+        padding: 18px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 15px;
+    }
+
+    .load-btn {
+        padding: 12px;
+        width: 130px;
+        background-color: #B4C9C7;
+        color: #445A67;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .load-btn:hover {
+        background-color: #57838D;
+        color: white;
+    }
+
+    .check-btn {
+        background-color: #57838D;
+        color: white;
+    }
+
+    .check-btn:hover {
+        background-color: #445A67;
+    }
+
+    .book-btn {
+        background-color: #F3BFB3;
+        color: #445A67;
+    }
+
+    .book-btn:hover {
+        background-color: #CCADB2;
+    }
+
+    .back-btn {
+        background-color: #445A67;
+        color: white;
+    }
+
+    .back-btn:hover {
+        background-color: #57838D;
+    }
+
+</style>
+
+<script>
+
+    // =======================
+    // LOAD GUEST BY NIC
+    // =======================
     async function loadGuest() {
 
-        const nic = document.getElementById("nic").value;
+        const nic = document.getElementById("nic").value.trim();
 
         if (!nic) {
-            alert("Enter NIC first");
+            alert("Please enter NIC first.");
             return;
         }
 
         try {
             const response = await fetch("/guest?nic=" + encodeURIComponent(nic));
-            const data = await response.json();
 
-            console.log(data); // DEBUG
+            if (!response.ok) {
+                alert("Error fetching guest.");
+                return;
+            }
+
+            const data = await response.json();
 
             if (data.exists) {
                 document.getElementById("name").value = data.name;
                 document.getElementById("address").value = data.address;
                 document.getElementById("contact").value = data.contact;
             } else {
-                alert("New to our hotel?");
-                window.location.href = "/register.html";
+                alert("Guest not found. Please register first.");
             }
 
         } catch (error) {
-            console.error("Error:", error);
-            alert("Something went wrong");
+            alert("Server error while loading guest.");
+            console.error(error);
         }
     }
-    
-    function loadRooms() {
 
-        const selected = document.querySelector('input[name="typeId"]:checked');
-
-        if (!selected) return;
-
-        const typeId = selected.value;
-
-        fetch('/availableRooms?typeId=' + typeId)
-            .then(response => response.json())
-            .then(data => {
-
-                const select = document.getElementById('roomSelect');
-                select.innerHTML = '<option value="">-- Select Room --</option>';
-
-                data.forEach(room => {
-                    const option = document.createElement('option');
-                    option.value = room.roomId;
-                    option.textContent = room.roomNumber;
-                    select.appendChild(option);
-                });
-            });
-    }
-    
+    // =======================
+    // CHECK AVAILABILITY
+    // =======================
     function checkAvailability() {
 
-        const typeRadio = document.querySelector('input[name="typeId"]:checked');
+        const selected = document.querySelector('input[name="typeId"]:checked');
         const checkIn = document.getElementById("checkIn").value;
         const checkOut = document.getElementById("checkOut").value;
 
-        if (!typeRadio || !checkIn || !checkOut) {
-            alert("Please select room type and dates first.");
+        if (!selected) {
+            alert("Please select a room type.");
             return;
         }
 
-        const typeId = typeRadio.value;
+        if (!checkIn || !checkOut) {
+            alert("Please select check-in and check-out dates.");
+            return;
+        }
+
+        const typeId = selected.value;
 
         fetch(`/availableRooms?typeId=${typeId}&checkIn=${checkIn}&checkOut=${checkOut}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Server error");
+                }
+                return response.json();
+            })
             .then(data => {
 
                 const select = document.getElementById("roomSelect");
@@ -85,64 +286,162 @@
                 data.forEach(room => {
                     const option = document.createElement("option");
                     option.value = room.roomId;
-                    option.textContent = room.roomNumber;
+                    option.textContent =  room.roomNumber;
                     select.appendChild(option);
                 });
+
+            })
+            .catch(error => {
+                alert("Error checking availability.");
+                console.error(error);
             });
     }
+
+    // =======================
+    // DASHBOARD NAVIGATION
+    // =======================
+    function goDashboard() {
+        window.location.href = "/dashboard";
+    }
+
+       document.addEventListener("DOMContentLoaded", function () {
+
+        const form = document.getElementById("bookingForm");
+
+        form.addEventListener("submit", function(e) {
+
+            e.preventDefault();
+
+            const formData = new URLSearchParams(new FormData(form));
+
+            fetch("/book", {
+                method: "POST",
+                body: formData,
+                credentials: "include"   // 🔥 VERY IMPORTANT
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                alert(data.message);
+
+                if (data.success) {
+                    form.reset();
+                    document.getElementById("roomSelect").innerHTML =
+                        '<option value="">-- Select Room --</option>';
+                }
+
+            })
+            .catch(error => {
+                alert("Booking failed.");
+                console.error(error);
+            });
+
+        });
+
+    });
 </script>
+
 </head>
-<body>
 
-<h2>Book a Room</h2>
+    <body>
 
-<form method="POST" action="/book">
+        <div class="container">
 
-    NIC:
-    <input type="text" id="nic" name="nic">
-    <button type="button" onclick="loadGuest()">Load</button>
-    <br><br>
+            <h2>Room Reservation</h2>
 
-    Name:
-    <input type="text" id="name" name="name"><br><br>
+            <form id="bookingForm">
 
-    Address:
-    <input type="text" id="address" name="address"><br><br>
+            <!-- NIC -->
+            <div class="form-group">
+                <label for="nic">NIC Number</label>
+                <div class="nic-row">
+                    <input type="text" id="nic" name="nic" placeholder="Enter NIC" required>
+                    <button type="button" class="load-btn" onclick="loadGuest()">Load</button>
+                </div>
+            </div>
 
-    Contact:
-    <input type="text" id="contact" name="contact"><br><br>
+            <!-- Guest Info -->
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
 
-    <h3>Select Room Type</h3>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" required>
+            </div>
 
-    <label><input type="radio" name="typeId" value="1"> STANDARD</label><br>
-    <label><input type="radio" name="typeId" value="2"> DELUXE</label><br>
-    <label><input type="radio" name="typeId" value="3"> SUITE</label><br>
-    <label><input type="radio" name="typeId" value="4"> FAMILY</label><br>
-    <label><input type="radio" name="typeId" value="5"> PRESIDENTIAL</label>
+            <div class="form-group">
+                <label for="contact">Contact Number</label>
+                <input type="text" id="contact" name="contact" required>
+            </div>
 
-    <br><br>
+            <!-- Room Type -->
+            <div class="form-group">
+                <label>Select Room Type</label>
+                <div class="room-types">
 
-    Check-in:
-    <input type="date" id="checkIn" name="checkIn"><br><br>
+                    <label class="room-option">
+                        <input type="radio" name="typeId" value="1">
+                        STANDARD
+                    </label>
 
-    Check-out:
-    <input type="date" id="checkOut" name="checkOut"><br><br>
+                    <label class="room-option">
+                        <input type="radio" name="typeId" value="2">
+                        DELUXE
+                    </label>
 
-    <button type="button" onclick="checkAvailability()">
-        Check Availability
-    </button>
+                    <label class="room-option">
+                        <input type="radio" name="typeId" value="3">
+                        SUITE
+                    </label>
 
-    <br><br>
+                    <label class="room-option">
+                        <input type="radio" name="typeId" value="4">
+                        FAMILY
+                    </label>
 
-    <label>Available Rooms:</label>
-    <select id="roomSelect" name="roomId">
-        <option value="">-- Select Room --</option>
-    </select>
-    
+                    <label class="room-option">
+                        <input type="radio" name="typeId" value="5">
+                        PRESIDENTIAL
+                    </label>
 
-    <button type="submit">Book Room</button>
+                </div>
+            </div>
 
-</form>
+            <!-- Dates -->
+            <div class="form-group">
+                <label for="checkIn">Check-In Date</label>
+                <input type="date" id="checkIn" name="checkIn" required>
+            </div>
 
-</body>
+            <div class="form-group">
+                <label for="checkOut">Check-Out Date</label>
+                <input type="date" id="checkOut" name="checkOut" required>
+            </div>
+
+            <button type="button" class="btn check-btn" onclick="checkAvailability()">
+                Check Availability
+            </button>
+
+            <div class="form-group">
+                <label for="roomSelect">Available Rooms</label>
+                <select id="roomSelect" name="roomId" required>
+                    <option value="">-- Select Room --</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn book-btn">
+                Book Room
+            </button>
+
+            <button type="button" class="btn back-btn" onclick="goDashboard()">
+                Back to Dashboard
+            </button>
+
+        </form>
+
+        </div>
+
+    </body>
 </html>

@@ -15,6 +15,8 @@ public class BillDAO {
         String sql = "INSERT INTO bills (reservation_id, total_amount) VALUES (?, ?)";
 
         try {
+            //Connection conn = DatabaseManager.getInstance().getConnection();
+
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             stmt.setInt(1, bill.getReservationId());

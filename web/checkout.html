@@ -1,20 +1,289 @@
 <html>
-    <head>
-        <title>Check-out Page</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
+<head>
+<meta charset="UTF-8">
+<title>Check-Out</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #445A67, #57838D);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    width: 420px;
+    background: white;
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+    text-align: center;
+}
+
+h2 {
+    color: #445A67;
+    margin-bottom: 25px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #B4C9C7;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #57838D;
+    box-shadow: 0 0 6px #57838D;
+}
+
+.btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 15px;
+}
+
+.checkout-btn {
+    background-color: #F3BFB3;
+    color: #445A67;
+}
+
+.checkout-btn:hover {
+    background-color: #CCADB2;
+}
+
+.back-btn {
+    background-color: #445A67;
+    color: white;
+}
+
+.back-btn:hover {
+    background-color: #57838D;
+}
+
+.message-box {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 10px;
+    display: none;
+    font-size: 14px;
+}
+
+.success {
+    background-color: #B4C9C7;
+    color: #445A67;
+}
+
+.error {
+    background-color: #F3BFB3;
+    color: #445A67;
+}
+
+.main-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 400px;
+    padding: 40px;
+}
+
+.left-section {
+    width: 750px;
+}
+
+.right-section {
+    flex: 1;
+}
+
+.filter-box {
+    margin-bottom: 20px;
+}
+
+.table-wrapper {
+    width: 100%;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("checkoutForm");
+
+    form.addEventListener("submit", function(e) {
+
+        e.preventDefault();
+
+        const formData = new URLSearchParams(new FormData(form));
+
+        fetch("/checkout", {
+            method: "POST",
+            body: formData,
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            const box = document.getElementById("messageBox");
+            box.style.display = "block";
+            box.textContent = data.message;
+
+            if (data.success) {
+                box.className = "message-box success";
+                form.reset();
+            } else {
+                box.className = "message-box error";
+            }
+        })
+        .catch(error => {
+            alert("Checkout failed.");
+            console.error(error);
+        });
+
+    });
+
+});
+
+function goDashboard() {
+    window.location.href = "/dashboard.html";
+}
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("toDate").value = today;
+
+    const past = new Date();
+    past.setDate(past.getDate() - 30);
+    document.getElementById("fromDate").value = past.toISOString().split("T")[0];
+
+    loadReservations();
+});
+
+function loadReservations() {
+
+    const from = document.getElementById("fromDate").value;
+    const to = document.getElementById("toDate").value;
+
+    fetch(`/reservations?from=${from}&to=${to}`, {
+        credentials: "include"
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        const tbody = document.getElementById("reservationTableBody");
+        tbody.innerHTML = "";
+
+        data.forEach(r => {
+
+            const row = `
+                <tr>
+                    <td>${r.reservationId}</td>
+                    <td>${r.guestName}</td>
+                    <td>${r.roomId}</td>
+                    <td>${r.checkIn}</td>
+                    <td>${r.checkOut}</td>
+                    <td>${r.status}</td>
+                </tr>
+            `;
+
+            tbody.innerHTML += row;
+        });
+
+    })
+    .catch(err => console.error(err));
+}
+    function goAvailableRooms() {
+    window.location.href = "/availableRoomsPage";
+}
+
+</script>
+
+</head>
     <body>
-        <h2>Checkout</h2>
+        <div class="left-section">
+        <div class="container">
+            <button class="btn back-btn" onclick="goAvailableRooms()">
+    Available Rooms
+</button>
 
-<form method="POST" action="/checkout">
-    Reservation ID:
-    <input type="number" name="reservationId" required>
-    <br><br>
-    <button type="submit">Checkout</button>
-</form>
+            <h2>Guest Check-Out</h2>
 
-<br>
-<a href="/">Back</a>
-    </body>
+            <form id="checkoutForm">
+
+                <input type="number"
+                       name="reservationId"
+                       placeholder="Enter Reservation ID"
+                       required>
+
+                <button type="submit" class="btn checkout-btn">
+                    Process Check-Out
+                </button>
+
+            </form>
+
+            <div id="messageBox" class="message-box"></div>
+
+            <button class="btn back-btn" onclick="goDashboard()">
+                Back to Dashboard
+            </button>
+            <h3>Recent Reservations</h3>
+
+        <!-- FILTER (Above Table) -->
+        <div class="filter-box">
+            From:
+            <input type="date" id="fromDate">
+
+            To:
+            <input type="date" id="toDate">
+
+            <button type="button" class="btn checkout-btn" onclick="loadReservations()">
+                Load
+            </button>
+        </div>
+
+        </div>
+    </div>
+
+<div class="main-wrapper">
+
+    <!-- LEFT SIDE (Checkout Form) -->
+    
+
+    <!-- RIGHT SIDE -->
+    <div class="right-section">
+
+        
+
+        <!-- TABLE -->
+        <div class="table-wrapper">
+            <table border="1" width="100%" cellpadding="8" style="border-collapse: collapse;">
+                <thead style="background:#445A67;color:white;">
+                    <tr>
+                        <th>ID</th>
+                        <th>Guest</th>
+                        <th>Room</th>
+                        <th>Check-In</th>
+                        <th>Check-Out</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="reservationTableBody"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
 </html>

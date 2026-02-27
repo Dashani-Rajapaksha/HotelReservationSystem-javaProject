@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Available Rooms</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #445A67, #57838D);
+    padding: 40px;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+h2 {
+    text-align: center;
+    color: #445A67;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    background-color: #445A67;
+    color: white;
+    padding: 12px;
+}
+
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background-color: #B4C9C7;
+}
+
+.btn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background-color: #445A67;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #57838D;
+}
+
+    /* ===== Date Filter Section ===== */
+
+    .date-filter {
+        display: flex;
+        align-items: flex-end;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .date-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .date-group label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #445A67;
+    }
+
+    .date-group input[type="date"] {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #B4C9C7;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    .date-group input[type="date"]:focus {
+        outline: none;
+        border-color: #57838D;
+        box-shadow: 0 0 6px #57838D;
+    }
+
+    /* Check Button */
+    .check-btn {
+        padding: 11px 20px;
+        background-color: #57838D;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.3s;
+        height: 40px;
+    }
+
+    .check-btn:hover {
+        background-color: #445A67;
+    }
+</style>
+
+<script>
+
+function loadRooms() {
+
+    fetch("/allRooms")
+    .then(response => response.json())
+    .then(data => {
+
+        const tbody = document.getElementById("roomsTableBody");
+        tbody.innerHTML = "";
+
+        data.forEach(room => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML =
+                "<td>" + room.roomNumber + "</td>" +
+                "<td>" + room.typeName + "</td>" +
+                "<td>Rs. " + room.rate + "</td>" +
+                "<td>" + room.status + "</td>";
+
+            tbody.appendChild(row);
+        });
+    })
+    .catch(error => {
+        alert("Error loading rooms");
+    });
+}
+
+function goCheckout() {
+    window.location.href = "/checkoutPage";
+}
+
+window.onload = loadRooms;
+
+//FILTER BY DATE
+function loadAvailableRooms() {
+
+    const checkIn = document.getElementById("checkIn").value;
+    const checkOut = document.getElementById("checkOut").value;
+
+    if (!checkIn || !checkOut) {
+        alert("Please select both dates.");
+        return;
+    }
+
+    fetch(`/availableRoomsByDate?checkIn=${checkIn}&checkOut=${checkOut}`, {
+        method: "GET",
+        credentials: "include"
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+        return response.json();
+    })
+    .then(data => {
+
+        const tbody = document.getElementById("roomsTableBody");
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='4'>No rooms found</td></tr>";
+            return;
+        }
+
+        data.forEach(room => {
+            const row = `
+                <tr>
+                    <td>${room.roomNumber}</td>
+                    <td>${room.typeName}</td>
+                    <td>${room.rate}</td>
+                    <td>${room.status}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Error loading rooms.");
+    });
+}
+
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>All Rooms</h2>
+<div class="date-filter">
+
+    <div class="date-group">
+        <label for="checkIn">Check-In</label>
+        <input type="date" id="checkIn">
+    </div>
+
+    <div class="date-group">
+        <label for="checkOut">Check-Out</label>
+        <input type="date" id="checkOut">
+    </div>
+
+    <button type="button"
+            class="check-btn"
+            onclick="loadAvailableRooms()">
+        Check
+    </button>
+
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Room Number</th>
+            <th>Type</th>
+            <th>Rate</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody id="roomsTableBody"></tbody>
+</table>
+
+<button class="btn" onclick="goCheckout()">Back to Check-out</button>
+
+</div>
+
+</body>
+</html>

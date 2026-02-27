@@ -1,82 +1,247 @@
-<!DOCTYPE html>
 <html>
 <head>
-    <title>Print Bill</title>
+<meta charset="UTF-8">
+<title>Calculate & Print Bill</title>
 
-    <style>
-        body {
-            font-family: Arial;
-        }
+<style>
 
-        .bill-container {
-            border: 2px solid black;
-            padding: 20px;
-            width: 400px;
-            margin-top: 20px;
-            display: none;
-        }
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #445A67, #57838D);
+    padding: 40px;
+    color: #445A67;
+}
 
-        .buttons {
-            margin-top: 15px;
-        }
+.wrapper {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
 
-        @media print {
-            body * {
-                visibility: hidden;
-            }
+/* LEFT PANEL */
+.card {
+    width: 350px;
+    background: white;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+}
 
-            .bill-container, .bill-container * {
-                visibility: visible;
-            }
+.card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-            .bill-container {
-                position: absolute;
-                left: 0;
-                top: 0;
-            }
-        }
-    </style>
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #B4C9C7;
+    margin-bottom: 15px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #57838D;
+    box-shadow: 0 0 6px #57838D;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.load-btn {
+    background: #B4C9C7;
+    color: #445A67;
+}
+
+.generate-btn {
+    background: #F3BFB3;
+    color: #445A67;
+}
+
+.back-btn {
+    background: #445A67;
+    color: white;
+}
+
+/* TABLE SECTION */
+.table-section {
+    flex: 1;
+    background: white;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #445A67;
+    color: white;
+    padding: 10px;
+}
+
+td {
+    
+    padding: 20px 20px 20px 80px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* BILL PRINT DESIGN */
+.bill-container {
+    margin-top: 30px;
+    border: 2px solid #445A67;
+    padding: 25px;
+    display: none;
+    border-radius: 10px;
+    background: white;
+}
+
+.bill-container h3 {
+    text-align: center;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .bill-container, .bill-container * {
+        visibility: visible;
+    }
+
+    .bill-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}
+
+</style>
 </head>
+
 <body>
 
-<h2>Calculate & Print Bill</h2>
+<div class="wrapper">
 
-Reservation ID:
-<input type="number" id="reservationId" required>
-<button onclick="generateBill()">Generate</button>
+    <!-- LEFT PANEL -->
+    <div class="card">
 
-<div class="bill-container" id="billContainer">
-    <h3>HOTEL INVOICE</h3>
-    <hr>
-    <p><strong>Reservation ID:</strong> <span id="b_resId"></span></p>
-    <p><strong>Room ID:</strong> <span id="b_roomId"></span></p>
-    <p><strong>Check-In:</strong> <span id="b_checkIn"></span></p>
-    <p><strong>Check-Out:</strong> <span id="b_checkOut"></span></p>
-    <p><strong>Nights:</strong> <span id="b_nights"></span></p>
-    <p><strong>Total Amount:</strong> Rs. <span id="b_total"></span></p>
-    <hr>
+        <h2>Generate Bill</h2>
 
-    <div class="buttons">
-        <button onclick="window.print()">Print Bill</button>
+        <input type="text" id="nic" placeholder="Enter NIC">
+        <button class="load-btn" onclick="loadReservations()">Load Active Reservations</button>
+
+        <input type="number" id="reservationId" placeholder="Enter Reservation ID">
+        <button class="generate-btn" onclick="generateBill()">Generate Bill</button>
+
+        <button class="back-btn" onclick="goDashboard()">Back to Dashboard</button>
+
     </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="table-section">
+
+        <h3>Active Reservations</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Nights</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody id="reservationTableBody"></tbody>
+        </table>
+
+        <!-- PRINTABLE BILL -->
+        <div class="bill-container" id="billContainer">
+
+            <h3>Ocean View Resort - Galle : INVOICE</h3>
+            <hr>
+
+            <p><strong>Reservation No:</strong> <span id="b_resId"></span></p>
+            <p><strong>NIC:</strong> <span id="b_nic"></span></p>
+            <p><strong>Guest Name:</strong> <span id="b_name"></span></p>
+            <p><strong>Bill Date:</strong> <span id="b_date"></span></p>
+            <p><strong>Room Number:</strong> <span id="b_roomId"></span></p>
+            <p><strong>Check-In:</strong> <span id="b_checkIn"></span></p>
+            <p><strong>Check-Out:</strong> <span id="b_checkOut"></span></p>
+            <p><strong>Nights:</strong> <span id="b_nights"></span></p>
+            <p><strong>Total Amount:</strong> Rs. <span id="b_total"></span></p>
+
+            <hr>
+            <button onclick="window.print()">Print Bill</button>
+
+        </div>
+
+    </div>
+
 </div>
 
-<br><br>
-<a href="/dashboard.html">Back</a>
-
 <script>
+
+// LOAD ACTIVE RESERVATIONS BY NIC
+function loadReservations() {
+
+    const nic = document.getElementById("nic").value;
+
+    fetch("/activeReservationsByNic?nic=" + nic)
+    .then(res => res.json())
+    .then(data => {
+
+        const table = document.getElementById("reservationTableBody");
+        table.innerHTML = "";
+
+        data.forEach(r => {
+
+            table.innerHTML += `
+                <tr>
+                    <td>${r.reservationId}</td>
+                    <td>${r.checkIn}</td>
+                    <td>${r.checkOut}</td>
+                    <td>${r.nights}</td>
+                    <td>${r.amount}</td>
+                </tr>
+            `;
+        });
+
+    })
+    .catch(() => alert("Error loading reservations"));
+}
+
+
+// GENERATE BILL
 function generateBill() {
 
     const reservationId = document.getElementById("reservationId").value;
 
+    if (!reservationId) {
+        alert("Please enter Reservation ID");
+        return;
+    }
+
     fetch("/bill", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "reservationId=" + reservationId
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: "reservationId=" + encodeURIComponent(reservationId)
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
 
         if (data.success) {
@@ -84,21 +249,30 @@ function generateBill() {
             document.getElementById("billContainer").style.display = "block";
 
             document.getElementById("b_resId").innerText = data.reservationId;
-            document.getElementById("b_roomId").innerText = data.roomId;
+            document.getElementById("b_nic").innerText = data.nic;
+            document.getElementById("b_name").innerText = data.name;
+            document.getElementById("b_date").innerText = new Date().toLocaleDateString(); // 🔥 better to use backend date
+            document.getElementById("b_roomId").innerText = data.roomNumber;
             document.getElementById("b_checkIn").innerText = data.checkIn;
             document.getElementById("b_checkOut").innerText = data.checkOut;
             document.getElementById("b_nights").innerText = data.nights;
             document.getElementById("b_total").innerText = data.total;
 
         } else {
-            alert("Bill not found!");
+            alert("Bill not found or reservation not active!");
         }
 
     })
     .catch(error => {
-        alert("Error generating bill.");
+        console.error(error);
+        alert("Error generating bill");
     });
 }
+
+function goDashboard() {
+    window.location.href = "/dashboardPage";
+}
+
 </script>
 
 </body>

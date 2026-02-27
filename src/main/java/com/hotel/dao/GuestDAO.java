@@ -1,19 +1,30 @@
 package com.hotel.dao;
-
 import com.hotel.database.DatabaseManager;
 import com.hotel.model.Guest;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 public class GuestDAO {
+    
+    public class GuestSaveResult {
+    private int guestId;
+    private boolean isNew;
 
-    public int saveOrGetGuest(Connection conn, Guest guest) {
+    public GuestSaveResult(int guestId, boolean isNew) {
+        this.guestId = guestId;
+        this.isNew = isNew;
+    }
+
+    public int getGuestId() { return guestId; }
+    public boolean isNew() { return isNew; }
+}
+
+    public GuestSaveResult saveOrGetGuest(Connection conn, Guest guest) {
 
     try {
-        // 1️⃣ Check if NIC already exists
+
         String checkSql = "SELECT guest_id FROM guests WHERE NIC = ?";
         PreparedStatement checkStmt = conn.prepareStatement(checkSql);
         checkStmt.setString(1, guest.getNic());
@@ -21,34 +32,34 @@ public class GuestDAO {
         ResultSet rs = checkStmt.executeQuery();
 
         if (rs.next()) {
-            // Guest already exists
-            return rs.getInt("guest_id");
+            // Guest exists
+            return new GuestSaveResult(rs.getInt("guest_id"), false);
         }
 
-        // 2️⃣ Insert new guest
+        // Insert new guest
         String insertSql = "INSERT INTO guests (name, address, contact, NIC) VALUES (?, ?, ?, ?)";
-        PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement insertStmt =
+                conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
 
         insertStmt.setString(1, guest.getName());
         insertStmt.setString(2, guest.getAddress());
         insertStmt.setString(3, guest.getContact());
         insertStmt.setString(4, guest.getNic());
 
-        int rowsInserted = insertStmt.executeUpdate();
+        insertStmt.executeUpdate();
 
-        if (rowsInserted > 0) {
-            ResultSet generatedKeys = insertStmt.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                return generatedKeys.getInt(1);
-            }
+        ResultSet keys = insertStmt.getGeneratedKeys();
+        if (keys.next()) {
+            return new GuestSaveResult(keys.getInt(1), true);
         }
 
     } catch (Exception e) {
         e.printStackTrace();
     }
 
-    return -1;
+    return null;
 }
+    
     public Guest findByNic(Connection conn, String nic) {
 
     String sql = "SELECT * FROM guests WHERE NIC = ?";
@@ -74,4 +85,5 @@ public class GuestDAO {
 
     return null;
 }
+
 }

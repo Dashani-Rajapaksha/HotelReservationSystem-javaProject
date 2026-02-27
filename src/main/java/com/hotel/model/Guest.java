@@ -39,3 +39,4 @@ public class Guest {
         return nic;
     }
 }
+

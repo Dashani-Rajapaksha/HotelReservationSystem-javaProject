@@ -1,5 +1,4 @@
 package com.hotel.dao;
-
 import com.hotel.database.DatabaseManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +19,7 @@ public class UserDAO {
 
             ResultSet rs = stmt.executeQuery();
 
-            return rs.next(); // true if found
+            return rs.next(); // true if user exists
 
         } catch (Exception e) {
             e.printStackTrace();
