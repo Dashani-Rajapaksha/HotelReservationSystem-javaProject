@@ -40,7 +40,7 @@ public class ReservationService {
 
         try {
             conn = DatabaseManager.getInstance().getConnection();
-            conn.setAutoCommit(false); // Start Transaction
+            conn.setAutoCommit(false); // Start Transaction (Refactor-friendly)
 
             // Save or get guest
             Guest guest = new Guest(name, address, contact, nic);
@@ -82,7 +82,7 @@ public class ReservationService {
                 throw new Exception("Failed to update room status");
             }
 
-            conn.commit(); // Success
+            conn.commit(); // Success (Refactor-friendly)
 
             System.out.println("Booking successful!");
             System.out.println("Reservation ID: " + reservationId);
@@ -95,7 +95,7 @@ public class ReservationService {
 
             try {
                 if (conn != null) {
-                    conn.rollback(); // Rollback everything
+                    conn.rollback(); // Rollback everything (Refactor-friendly)
                 }
             } catch (Exception rollbackEx) {
                 rollbackEx.printStackTrace();

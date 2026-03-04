@@ -17,8 +17,8 @@ public class ReservationServiceTest {
                 "0712345678",
                 "1234",                 //<<<<<----------invalid NIC
                 1,
-                "2025-12-01",
-                "2025-12-05"
+                "2026-03-08",
+                "2025-03-09"
         );
 
         assertFalse(result.isSuccess());
@@ -82,5 +82,5 @@ public class ReservationServiceTest {
         String json = service.generateBillJson(5000);
 
         assertTrue(json.contains("\"success\": false"));
-    }
+    }    
 }
